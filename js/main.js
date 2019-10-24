@@ -12,7 +12,9 @@ import {
     Vector3,
     Geometry,
     Face3,
-    BoxGeometry
+    BoxGeometry,
+    Light,
+    Object3D
 } from './lib/three.module.js';
 
 import Utilities from './lib/Utilities.js';
@@ -22,8 +24,19 @@ import TextureSplattingMaterial from './materials/TextureSplattingMaterial.js';
 import TerrainBufferGeometry from './terrain/TerrainBufferGeometry.js';
 
 import Skybox from "./terrain/Skybox.js";
+import Sun from "./terrain/sun.js";
 
 const scene = new Scene();
+
+//-------------------------------------SUN------------------------------------------------------------------
+let sun = new Sun({textureMap: 0xffff99, radius: 10, height: 60, width: 40});
+sun.position.set(0, 420, 0);
+let sunOrbit = new Object3D();
+sunOrbit.position.set(0, 0, 0);
+scene.add(sunOrbit);
+scene.add(sun);
+sunOrbit.add(sun);
+
 
 const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -53,7 +66,7 @@ window.addEventListener('resize', () => {
 document.body.appendChild(renderer.domElement);
 
 const directionalLight = new DirectionalLight(0xffffff);
-directionalLight.position.set(30, 40, 0);
+directionalLight.position.set(0, 420, 0);
 
 directionalLight.castShadow = true;
 
@@ -65,6 +78,7 @@ directionalLight.shadow.camera.far = 500;     // default
 
 scene.add(directionalLight);
 
+sunOrbit.add(directionalLight);
 
 const geometry = new BoxBufferGeometry(0, 0, 0);
 const material = new MeshPhongMaterial({ color: 0xffdd11, reflectivity: 0.8 });
@@ -278,7 +292,7 @@ function loop(now) {
     const delta = now - then;
     then = now;
 
-    const moveSpeed = move.speed * delta;
+    const moveSpeed = move.speed * delta * 10;
 
     velocity.set(0.0, 0.0, 0.0);
 
@@ -312,6 +326,10 @@ function loop(now) {
     // animate cube rotation:
     triforce.rotation.x += 0.01;
     triforce.rotation.y += 0.01;
+
+    //orbital for sun
+    sunOrbit.rotation.x += 0.0001;
+
 
     // render scene:
     renderer.render(scene, camera);
