@@ -22,6 +22,7 @@ import TextureSplattingMaterial from './materials/TextureSplattingMaterial.js';
 import TerrainBufferGeometry from './terrain/TerrainBufferGeometry.js';
 
 import Skybox from "./terrain/Skybox.js";
+import Grass from "./terrain/Grass";
 
 const scene = new Scene();
 
@@ -81,6 +82,7 @@ camera.position.y = 25;
 const skyTexture = new TextureLoader().load('resources/textures/skybox.jpg');
 const skybox = new Skybox({textureMap: skyTexture, radius: 500, widthSegments: 60, heightSegments: 40});
 scene.add(skybox);
+
 
 //---------------------TRIFORCE----------------------------
 /*
