@@ -1,6 +1,6 @@
-import {DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry} from "../lib/three.module.js";
+/*import {DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry} from "../lib/three.module.js";
 import {LOD} from "../../../../DAT155_project/dat155-threejs-template/js/lib/three.module.js";
-import {TextureLoader} from "../lib/three.module";
+import {TextureLoader} from "../lib/three.module.js";
 
 export default class Grass extends Mesh{
     constructor ({textureMap, height, width}){
@@ -18,7 +18,7 @@ export default class Grass extends Mesh{
                 object.update(camera);
                 object.children[1].quaternion.copy(camera, quaternion);
             }
-        })
+        });
         super({objMaterial, object2});
     }
 }
@@ -26,3 +26,4 @@ const GrassTexture = new TextureLoader().load('resources/textures/grassbillboard
 const grass = new Grass({textureMap:GrassTexture,height:1, width:1});
 grass.position.set(0,10,0);
 scene.add(grass);
+*/

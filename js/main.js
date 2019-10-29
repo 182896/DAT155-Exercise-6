@@ -24,11 +24,9 @@ import TextureSplattingMaterial from './materials/TextureSplattingMaterial.js';
 import TerrainBufferGeometry from './terrain/TerrainBufferGeometry.js';
 
 import Skybox from "./terrain/Skybox.js";
-<<<<<<< HEAD
-import Grass from "./terrain/Grass";
-=======
-import Sun from "./terrain/sun.js";
->>>>>>> 3b7e84341fcc841444874a7c517ea55e7d87450b
+//import Grass from "./terrain/Grass.js";
+import Sun from "./terrain/Sun.js";
+import Moon from "./terrain/Moon.js";
 
 const scene = new Scene();
 
@@ -40,7 +38,12 @@ sunOrbit.position.set(0, 0, 0);
 scene.add(sunOrbit);
 scene.add(sun);
 sunOrbit.add(sun);
-
+//-----------------------------------MOON--------------------------------------------------------------------
+let moonTexture = new TextureLoader().load('resources/textures/moonmap1k.jpg');
+let moon = new Moon({textureMap: moonTexture, radius: 3, height: 60, width: 40});
+moon.position.set(0, -420, 0);
+scene.add(moon);
+sunOrbit.add(moon);
 
 const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -332,8 +335,10 @@ function loop(now) {
     triforce.rotation.y += 0.01;
 
     //orbital for sun
-    sunOrbit.rotation.x += 0.0001;
+    sunOrbit.rotation.x += 0.001;
 
+    //rotation for moon
+    moon.rotation.y += 0.1;
 
     // render scene:
     renderer.render(scene, camera);
