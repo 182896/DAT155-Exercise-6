@@ -14,7 +14,10 @@ import {
     Face3,
     BoxGeometry,
     Light,
-    Object3D
+    Object3D,
+    CameraHelper,
+    MeshBasicMaterial,
+    PlaneGeometry
 } from './lib/three.module.js';
 
 import Utilities from './lib/Utilities.js';
@@ -36,16 +39,16 @@ sun.position.set(0, 420, 0);
 let sunOrbit = new Object3D();
 sunOrbit.position.set(0, 0, 0);
 scene.add(sunOrbit);
-scene.add(sun);
 sunOrbit.add(sun);
 //-----------------------------------MOON--------------------------------------------------------------------
 let moonTexture = new TextureLoader().load('resources/textures/moonmap1k.jpg');
 let moon = new Moon({textureMap: moonTexture, radius: 3, height: 60, width: 40});
 moon.position.set(0, -420, 0);
-scene.add(moon);
+moon.rotateX(90);
 sunOrbit.add(moon);
 
-const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+//-------------------------CAMERA-----------------------------------------------------------------
+const camera = new PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 const renderer = new WebGLRenderer();
 renderer.setClearColor(0xffffff);
@@ -72,29 +75,25 @@ window.addEventListener('resize', () => {
  */
 document.body.appendChild(renderer.domElement);
 
-const directionalLight = new DirectionalLight(0xffffff);
-directionalLight.position.set(0, 420, 0);
+//-------------------SUNLIGHT--------------------------
+let sunLight = new DirectionalLight(0xffffff, 1);
 
-directionalLight.castShadow = true;
+sunLight.castShadow = true;
 
 //Set up shadow properties for the light
-directionalLight.shadow.mapSize.width = 512;  // default
-directionalLight.shadow.mapSize.height = 512; // default
-directionalLight.shadow.camera.near = 0.5;    // default
-directionalLight.shadow.camera.far = 500;     // default
-
-scene.add(directionalLight);
-
-sunOrbit.add(directionalLight);
-
+sunLight.shadow.mapSize.width = 512;  // default
+sunLight.shadow.mapSize.height = 512; // default
+sunLight.shadow.camera.near = 0.5;    // default
+sunLight.shadow.camera.far = 500;     // default
+//---------------CUBE OBJECT--------------------------------------
 const geometry = new BoxBufferGeometry(0, 0, 0);
 const material = new MeshPhongMaterial({ color: 0xffdd11, reflectivity: 0.8 });
 const triforce = new Mesh(geometry, material);
 
 triforce.castShadow = true;
-triforce.position.set(0, 15, 0);
+triforce.position.set(0, 25, 0);
 
-directionalLight.target = triforce;
+sunLight.target = triforce;
 
 camera.position.z = 10;
 camera.position.y = 25;
@@ -157,7 +156,7 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
         width,
         heightmapImage,
         numberOfSubdivisions: 128,
-        heihgt: 40
+        height: 40
     });
 
     // const terrainMaterial = new MeshPhongMaterial({
@@ -183,7 +182,7 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
         color: 0x777777,
         shininess: 0,
         textures: [snowyRockTexture, grassTexture],
-        splatMaps: [splatMap]
+        splatMaps: [splatMap],
     });
 
     const terrain = new Mesh(terrainGeometry, terrainMaterial);
@@ -194,6 +193,8 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
     scene.add(terrain);
 
 });
+
+//---------------------WATER----------------------
 
 /**
  * Set up camera controller:
@@ -234,6 +235,7 @@ let move = {
     speed: 0.01
 };
 
+let pause = false;
 window.addEventListener('keydown', (e) => {
     if (e.code === 'KeyW') {
         move.forward = true;
@@ -247,6 +249,10 @@ window.addEventListener('keydown', (e) => {
     } else if (e.code === 'KeyD') {
         move.right = true;
         e.preventDefault();
+    }else if ((e.code === "KeyF") && (pause === false)){
+        pause = true;
+    }else if ((e.code === "KeyF") && (pause === true)){
+        pause = false;
     }
 });
 
@@ -294,6 +300,9 @@ window.addEventListener('keyup', (e) => {
 const velocity = new Vector3(0.0, 0.0, 0.0);
 
 let then = performance.now();
+let moonBool = false;
+let moonPos = new Vector3();
+let sunPos = new Vector3();
 function loop(now) {
 
     const delta = now - then;
@@ -334,17 +343,37 @@ function loop(now) {
     triforce.rotation.x += 0.01;
     triforce.rotation.y += 0.01;
 
-    //orbital for sun
-    sunOrbit.rotation.x += 0.001;
+    if(pause === false) {
+        //orbital for sun
+        sunOrbit.rotation.x += 0.01;
+    }
 
     //rotation for moon
     moon.rotation.y += 0.1;
+
+    //light checks for sun and moon
+    moonPos.setFromMatrixPosition(moon.matrixWorld);
+    sunPos.setFromMatrixPosition(sun.matrixWorld);
+    if ((moonPos.y < 0) && (moonBool === false)){
+        moon.remove(sunLight);
+        sunLight.position.set(0,0,0);
+        sunLight.color.setHex(0xffffff);
+        sun.add(sunLight);
+        moonBool = true;
+    }
+    if ((moonPos.y >= 0) && (moonBool === true)){
+        sun.remove(sunLight);
+        sunLight.position.set(0,0,0);
+        sunLight.color.setHex(0x9999ff);
+        moon.add(sunLight);
+        moonBool = false;
+    }
 
     // render scene:
     renderer.render(scene, camera);
 
     requestAnimationFrame(loop);
 
-};
+}
 
 loop(performance.now());
