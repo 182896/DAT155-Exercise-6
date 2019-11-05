@@ -85,6 +85,8 @@ sunLight.shadow.mapSize.width = 512;  // default
 sunLight.shadow.mapSize.height = 512; // default
 sunLight.shadow.camera.near = 0.5;    // default
 sunLight.shadow.camera.far = 500;     // default
+
+
 //---------------CUBE OBJECT--------------------------------------
 const geometry = new BoxBufferGeometry(0, 0, 0);
 const material = new MeshPhongMaterial({ color: 0xffdd11, reflectivity: 0.8 });
@@ -272,6 +274,8 @@ window.addEventListener('keyup', (e) => {
     }
 });
 
+
+
 // // instantiate a loader
 // const loader = new OBJLoader();
 
@@ -300,9 +304,14 @@ window.addEventListener('keyup', (e) => {
 const velocity = new Vector3(0.0, 0.0, 0.0);
 
 let then = performance.now();
+//Position variables
 let moonBool = false;
 let moonPos = new Vector3();
 let sunPos = new Vector3();
+//Color variables
+let g = "ff";
+let b = "ff";
+let rgb;
 function loop(now) {
 
     const delta = now - then;
@@ -367,6 +376,17 @@ function loop(now) {
         sunLight.color.setHex(0x9999ff);
         moon.add(sunLight);
         moonBool = false;
+    }
+
+    //Regulating the intensity of the light to simulate more realistic day/night cycle
+    if(moonBool === true){
+        sunLight.intensity = (sunPos.y/2100)+0.2;
+        b = Math.floor((128+(255*(sunPos.y/840)))).toString(16);
+        g = Math.floor((170+(255*(sunPos.y/1260)))).toString(16);
+        rgb = "0xff"+g+b;
+        sunLight.color.setHex(rgb);
+    }else{
+        sunLight.intensity = (moonPos.y/2100)+0.2;
     }
 
     // render scene:
