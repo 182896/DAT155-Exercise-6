@@ -17,7 +17,8 @@ import {
     Object3D,
     CameraHelper,
     MeshBasicMaterial,
-    PlaneGeometry
+    PlaneGeometry,
+    Fog
 } from './lib/three.module.js';
 
 import Utilities from './lib/Utilities.js';
@@ -86,6 +87,17 @@ sunLight.shadow.mapSize.height = 512; // default
 sunLight.shadow.camera.near = 0.5;    // default
 sunLight.shadow.camera.far = 500;     // default
 
+//---------------------FOG--------------------------------
+{
+let color = 0xdddddd;
+let near = 0.1;
+let far = 500;
+scene.fog = new Fog(color, near, far);
+}
+//------------------SKYBOX----------------------------
+const skyTexture = new TextureLoader().load('resources/textures/skybox.jpg');
+const skybox = new Skybox({textureMap: skyTexture, radius: 500, widthSegments: 60, heightSegments: 40});
+scene.add(skybox);
 
 //---------------CUBE OBJECT--------------------------------------
 const geometry = new BoxBufferGeometry(0, 0, 0);
@@ -99,10 +111,6 @@ sunLight.target = triforce;
 
 camera.position.z = 10;
 camera.position.y = 25;
-
-const skyTexture = new TextureLoader().load('resources/textures/skybox.jpg');
-const skybox = new Skybox({textureMap: skyTexture, radius: 500, widthSegments: 60, heightSegments: 40});
-scene.add(skybox);
 
 //---------------------TRIFORCE----------------------------
 /*
