@@ -353,8 +353,8 @@ function loop(now) {
     triforce.rotation.y += 0.01;
 
     if(pause === false) {
-        //orbital for sun
-        sunOrbit.rotation.x += 0.01;
+        //orbital speed for sun and moon
+        sunOrbit.rotation.x += 0.001;
     }
 
     //rotation for moon
@@ -381,6 +381,7 @@ function loop(now) {
     //Regulating the intensity of the light to simulate more realistic day/night cycle
     if(moonBool === true){
         sunLight.intensity = (sunPos.y/2100)+0.2;
+        //Creating a sunset and sunrise color.
         b = Math.floor((128+(255*(sunPos.y/840)))).toString(16);
         g = Math.floor((170+(255*(sunPos.y/1260)))).toString(16);
         rgb = "0xff"+g+b;
