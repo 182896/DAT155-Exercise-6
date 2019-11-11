@@ -28,9 +28,10 @@ import TextureSplattingMaterial from './materials/TextureSplattingMaterial.js';
 import TerrainBufferGeometry from './terrain/TerrainBufferGeometry.js';
 
 import Skybox from "./terrain/Skybox.js";
-//import Grass from "./terrain/Grass.js";
+import Grass from "./terrain/Grass.js";
 import Sun from "./terrain/Sun.js";
 import Moon from "./terrain/Moon.js";
+import {Raycaster} from "../../../DAT155_project/dat155-threejs-template/js/lib/three.module.js";
 
 const scene = new Scene();
 
@@ -111,6 +112,11 @@ sunLight.target = triforce;
 
 camera.position.z = 10;
 camera.position.y = 25;
+
+//--------------RAYCASTING----------------------------------
+const origin = new Vector3(0.0, 50.0, 0.0);
+const current = new Vector3(0.0, -1.0, 0.0);
+const raycaster = new Raycaster(origin, current);
 
 //---------------------TRIFORCE----------------------------
 /*
@@ -196,6 +202,17 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
     });
 
     const terrain = new Mesh(terrainGeometry, terrainMaterial);
+
+    //------------------------GRASS--------------------------------------
+    console.log(terrain);
+    const GrassTexture = new TextureLoader().load('resources/textures/Grassbillboardtexture.png');
+    const grass = new Grass({textureMap:GrassTexture});
+    const cordArray = raycaster.intersectObject(terrain);
+    console.log(cordArray[0].point);
+    grass.position.set(cordArray[0].point.x,cordArray[0].point.y ,cordArray[0].point.z );
+    console.log(grass);
+    scene.add(grass);
+
 
     terrain.castShadow = true;
     terrain.receiveShadow = true;

@@ -1,29 +1,19 @@
-/*import {DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry} from "../lib/three.module.js";
-import {LOD} from "../../../../DAT155_project/dat155-threejs-template/js/lib/three.module.js";
-import {TextureLoader} from "../lib/three.module.js";
+import {Mesh, MeshBasicMaterial, PlaneGeometry} from "../../../../DAT155_project/dat155-threejs-template/js/lib/three.module.js";
+import {DoubleSide} from "../../../../DAT155_project/dat155-threejs-template/js/lib/three.module.js";
+import {SpriteMaterial} from "../../../../DAT155_project/dat155-threejs-template/js/lib/three.module.js";
+import {Sprite} from "../../../../DAT155_project/dat155-threejs-template/js/lib/three.module.js";
+export default class Grass{
 
-export default class Grass extends Mesh{
-    constructor ({textureMap, height, width}){
+    constructor ({textureMap}){
         // make the billboard
-
-        let objMaterial = new MeshBasicMaterial({transparent: true, map : textureMap});
+        let objMaterial = new SpriteMaterial({transparent: true, map : textureMap});
         objMaterial.depthTest = false;
         objMaterial.side = DoubleSide;
-        let object2 = new Mesh(new PlaneGeometry(width,height), objMaterial);
+        //let objMaterial = new SpriteMaterial({geometry: geometry, map: textureMap, transparent: true, alphaTest: 0.5, depthTest: false, alphaMap: 0xffffff});
+        let object2 = new Sprite(objMaterial);
         object2.name = "Billboard";
         object2.receiveShadow = true;
 
-        scene.traverse(function(object){
-            if (object instanceof  LOD){
-                object.update(camera);
-                object.children[1].quaternion.copy(camera, quaternion);
-            }
-        });
-        super({objMaterial, object2});
+        return(object2);
     }
 }
-const GrassTexture = new TextureLoader().load('resources/textures/grassbillboardtexture.jpg');
-const grass = new Grass({textureMap:GrassTexture,height:1, width:1});
-grass.position.set(0,10,0);
-scene.add(grass);
-*/
