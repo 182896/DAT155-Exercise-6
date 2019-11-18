@@ -63,7 +63,7 @@ export default class TextureSplattingMaterial extends ShaderMaterial {
             uniforms.splatMaps = {
                 type: "tv",
                 value: splatMaps
-            }
+            };
 
             uniforms.textureUvTransforms = {
                 type: "Matrix3fv",

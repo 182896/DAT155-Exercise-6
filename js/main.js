@@ -10,6 +10,7 @@ import {
     DirectionalLight,
     MeshPhongMaterial,
     Vector3,
+    Vector2,
     Geometry,
     Face3,
     BoxGeometry,
@@ -18,9 +19,12 @@ import {
     CameraHelper,
     MeshBasicMaterial,
     PlaneGeometry,
-    Fog
+    Fog,
+    Raycaster,
+    ShaderMaterial,
+    UniformsUtils,
+    UniformsLib
 } from './lib/three.module.js';
-
 import Utilities from './lib/Utilities.js';
 import MouseLookController from './controls/MouseLookController.js';
 
@@ -31,11 +35,11 @@ import Skybox from "./terrain/Skybox.js";
 import Grass from "./terrain/Grass.js";
 import Sun from "./terrain/Sun.js";
 import Moon from "./terrain/Moon.js";
-import {Raycaster} from "../../../DAT155_project/dat155-threejs-template/js/lib/three.module.js";
+import Water from "./terrain/Water.js";
 
 const scene = new Scene();
-
 //-------------------------------------SUN------------------------------------------------------------------
+
 let sun = new Sun({textureMap: 0xffff99, radius: 10, height: 60, width: 40});
 sun.position.set(0, 420, 0);
 let sunOrbit = new Object3D();
@@ -43,12 +47,12 @@ sunOrbit.position.set(0, 0, 0);
 scene.add(sunOrbit);
 sunOrbit.add(sun);
 //-----------------------------------MOON--------------------------------------------------------------------
+
 let moonTexture = new TextureLoader().load('resources/textures/moonmap1k.jpg');
 let moon = new Moon({textureMap: moonTexture, radius: 3, height: 60, width: 40});
 moon.position.set(0, -420, 0);
 moon.rotateX(90);
 sunOrbit.add(moon);
-
 //-------------------------CAMERA-----------------------------------------------------------------
 const camera = new PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -89,16 +93,18 @@ sunLight.shadow.camera.near = 0.5;    // default
 sunLight.shadow.camera.far = 500;     // default
 
 //---------------------FOG--------------------------------
-{
-let color = 0xdddddd;
-let near = 0.1;
-let far = 500;
-scene.fog = new Fog(color, near, far);
-}
+
+let dayColor = 0xdddddd;
+let nightColor = 0x000000;
+let fognear = 0.1;
+let fogfar = 500;
+
 //------------------SKYBOX----------------------------
 const skyTexture = new TextureLoader().load('resources/textures/skybox.jpg');
 const skybox = new Skybox({textureMap: skyTexture, radius: 500, widthSegments: 60, heightSegments: 40});
-scene.add(skybox);
+
+const nightTexture = new TextureLoader().load("resources/textures/skyboxNight.jpg");
+const nightbox = new Skybox({textureMap: nightTexture, radius: 500, widthSegments: 60, heightSegments: 40});
 
 //---------------CUBE OBJECT--------------------------------------
 const geometry = new BoxBufferGeometry(0, 0, 0);
@@ -112,6 +118,8 @@ sunLight.target = triforce;
 
 camera.position.z = 10;
 camera.position.y = 25;
+//------------------GODRAYS---------------------------
+
 
 //--------------RAYCASTING----------------------------------
 const origin = new Vector3(0.0, 50.0, 0.0);
@@ -204,13 +212,10 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
     const terrain = new Mesh(terrainGeometry, terrainMaterial);
 
     //------------------------GRASS--------------------------------------
-    console.log(terrain);
     const GrassTexture = new TextureLoader().load('resources/textures/Grassbillboardtexture.png');
     const grass = new Grass({textureMap:GrassTexture});
     const cordArray = raycaster.intersectObject(terrain);
-    console.log(cordArray[0].point);
     grass.position.set(cordArray[0].point.x,cordArray[0].point.y ,cordArray[0].point.z );
-    console.log(grass);
     scene.add(grass);
 
 
@@ -221,12 +226,52 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
 
 });
 
-//---------------------WATER----------------------
+//---------------------WATER----------------------------------------
+
+
+//Size variables of water
+    let maxRow = 10;
+    let maxCol = 10;
+    let segmentRow = 10;
+    let segmentCol = 10;
+
+//Uniforms declaration
+    let angle = [];
+    for (let i = 0; i < 8; i++) {
+        let a = Math.random() * (2.0942) + (-1.0471);
+        angle [i] = new Vector2(Math.cos(a), Math.sin(a));
+    }
+
+//Texture for the water
+let loader = new TextureLoader();
+loader.setCrossOrigin("");
+let uniforms;
+let waterTexture;
+waterTexture = loader.load("resources/textures/water.jpg");
+waterTexture.wrapS = RepeatWrapping;
+waterTexture.wrapT = RepeatWrapping;
+waterTexture.repeat.set(25, 25);
+
+uniforms = UniformsUtils.merge([
+    {
+        time: {value: 0.1},
+        time2: {value: 0.1},
+        texture2: {value: null},
+        waterHeight: {value: 0.1},
+        amplitude: {value: [0.5, 0.25, 0.17, 0.125, 0.1, 0.083, 0.0714, 0.063]},
+        wavelength: {value: [25.133, 12.566, 8.378, 6.283, 5.027, 4.189, 3.590, 3.142]},
+        speed: {value: [1.2, 2.0, 2.8, 3.6, 4.4, 5.2, 6.0, 6.8]},
+        direction: {value: angle},
+        numWaves: {value: 100}
+    }
+]);
+uniforms.texture2.value = waterTexture;
+let ocean = new Water(1000, 1000, 10, 10, uniforms, new Vector3(0, 0, 0));
+scene.add(ocean);
 
 /**
  * Set up camera controller:
  */
-
 const mouseLookController = new MouseLookController(camera);
 
 // We attach a click lister to the canvas-element so that we can request a pointer lock.
@@ -263,6 +308,7 @@ let move = {
 };
 
 let pause = false;
+let renderPause = false;
 window.addEventListener('keydown', (e) => {
     if (e.code === 'KeyW') {
         move.forward = true;
@@ -280,7 +326,12 @@ window.addEventListener('keydown', (e) => {
         pause = true;
     }else if ((e.code === "KeyF") && (pause === true)){
         pause = false;
-    }
+    }else if ((e.code === "KeyZ") && (renderPause === false)){
+        renderPause = true;
+    }else if ((e.code === "KeyZ") && (renderPause === true)){
+        renderPause = false;
+        loop(performance.now());
+}
 });
 
 window.addEventListener('keyup', (e) => {
@@ -377,7 +428,7 @@ function loop(now) {
     triforce.rotation.x += 0.01;
     triforce.rotation.y += 0.01;
 
-    if(pause === false) {
+    if (pause === false) {
         //orbital speed for sun and moon
         sunOrbit.rotation.x += 0.001;
     }
@@ -388,38 +439,53 @@ function loop(now) {
     //light checks for sun and moon
     moonPos.setFromMatrixPosition(moon.matrixWorld);
     sunPos.setFromMatrixPosition(sun.matrixWorld);
-    if ((moonPos.y < 0) && (moonBool === false)){
+    if ((moonPos.y < 0) && (moonBool === false)) {
         moon.remove(sunLight);
-        sunLight.position.set(0,0,0);
+        sunLight.position.set(0, 0, 0);
         sunLight.color.setHex(0xffffff);
         sun.add(sunLight);
         moonBool = true;
+
+        scene.add(skybox);
+        scene.remove(nightbox);
+
+        scene.fog = new Fog(dayColor, fognear, fogfar);
     }
-    if ((moonPos.y >= 0) && (moonBool === true)){
+    if ((moonPos.y >= 0) && (moonBool === true)) {
         sun.remove(sunLight);
-        sunLight.position.set(0,0,0);
+        sunLight.position.set(0, 0, 0);
         sunLight.color.setHex(0x9999ff);
         moon.add(sunLight);
         moonBool = false;
+
+        scene.remove(skybox);
+        scene.add(nightbox);
+
+        scene.fog = new Fog(nightColor, fognear, fogfar);
     }
 
     //Regulating the intensity of the light to simulate more realistic day/night cycle
-    if(moonBool === true){
-        sunLight.intensity = (sunPos.y/2100)+0.2;
+    if (moonBool === true) {
+        sunLight.intensity = (sunPos.y / 2100) + 0.2;
         //Creating a sunset and sunrise color.
-        b = Math.floor((128+(255*(sunPos.y/840)))).toString(16);
-        g = Math.floor((170+(255*(sunPos.y/1260)))).toString(16);
-        rgb = "0xff"+g+b;
+        b = Math.floor((128 + (255 * (sunPos.y / 840)))).toString(16);
+        g = Math.floor((170 + (255 * (sunPos.y / 1260)))).toString(16);
+        rgb = "0xff" + g + b;
         sunLight.color.setHex(rgb);
-    }else{
-        sunLight.intensity = (moonPos.y/2100)+0.2;
+    } else {
+        sunLight.intensity = (moonPos.y / 2100) + 0.2;
     }
+
+    //Animating water
+    ocean.material.uniforms.time.value += 0.001;
+    ocean.material.uniforms.time2.value += 0.004;
 
     // render scene:
     renderer.render(scene, camera);
 
-    requestAnimationFrame(loop);
-
+    if (renderPause === false) {
+        requestAnimationFrame(loop);
+    }
 }
 
 loop(performance.now());

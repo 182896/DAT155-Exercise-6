@@ -1,7 +1,4 @@
-import {Mesh, MeshBasicMaterial, PlaneGeometry} from "../../../../DAT155_project/dat155-threejs-template/js/lib/three.module.js";
-import {DoubleSide} from "../../../../DAT155_project/dat155-threejs-template/js/lib/three.module.js";
-import {SpriteMaterial} from "../../../../DAT155_project/dat155-threejs-template/js/lib/three.module.js";
-import {Sprite} from "../../../../DAT155_project/dat155-threejs-template/js/lib/three.module.js";
+import {DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry, SpriteMaterial, Sprite} from "../lib/three.module.js";
 export default class Grass{
 
     constructor ({textureMap}){

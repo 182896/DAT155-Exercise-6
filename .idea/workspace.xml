@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6eb9a571-8e5b-459f-bbca-2231405474d4" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/js/terrain/Foggy.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/main.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -71,7 +69,9 @@
       <workItem from="1572732943771" duration="1837000" />
       <workItem from="1572947593605" duration="2807000" />
       <workItem from="1572966993442" duration="2439000" />
-      <workItem from="1573471783356" duration="2581000" />
+      <workItem from="1573471783356" duration="12643000" />
+      <workItem from="1573731691437" duration="16133000" />
+      <workItem from="1573929357576" duration="18941000" />
     </task>
     <servers />
   </component>
