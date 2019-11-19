@@ -112,11 +112,6 @@ const skybox = new Skybox({textureMap: skyTexture, radius: 500, widthSegments: 6
 const nightTexture = new TextureLoader().load("resources/textures/skyboxNight.jpg");
 const nightbox = new Skybox({textureMap: nightTexture, radius: 500, widthSegments: 60, heightSegments: 40});
 
-//--------------RAYCASTING----------------------------------
-const origin = new Vector3(0.0, 50.0, 0.0);
-const current = new Vector3(0.0, -1.0, 0.0);
-const raycaster = new Raycaster(origin, current);
-
 //---------------LOD OBJECT--------------------------------------
 const LODbox = new LODobject(0xffdd11);
 sunLight.target = LODbox;
