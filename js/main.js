@@ -170,12 +170,33 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
 
     const terrain = new Mesh(terrainGeometry, terrainMaterial);
 
-    //------------------------GRASS--------------------------------------
-    const GrassTexture = new TextureLoader().load('resources/textures/Grassbillboardtexture.png');
-    const grass = new Grass({textureMap:GrassTexture});
-    const cordArray = raycaster.intersectObject(terrain);
-    grass.position.set(cordArray[0].point.x,cordArray[0].point.y ,cordArray[0].point.z );
-    scene.add(grass);
+    //--------------GRASS----------------------------------
+
+    let GrassTexture = new TextureLoader().load('resources/textures/Grassbillboardtexture.png');
+
+    let x;
+    let z;
+
+    function makeGrass(grass){
+        x = Math.floor(Math.random()*49) + 1;
+        x *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+        z = Math.floor(Math.random()*49) + 1;
+        z *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+        const raycaster = new Raycaster();
+        const direction = new Vector3(0.0, -1.0, 0.0);
+        //const move = new Vector3();
+        raycaster.set(new Vector3(x, 150, z), direction);
+        let array = raycaster.intersectObject(terrain);
+        if(array[0].point.y<25 || array[0].point.y>5) {
+            grass.position.set(array[0].point.x, array[0].point.y+0.3, array[0].point.z);
+            scene.add(grass);
+        }
+    }
+
+    for(let i =0; i<200; i++){
+        const grass = new Grass({texture:GrassTexture});
+        makeGrass(grass);
+    }
 
 
     terrain.castShadow = true;
