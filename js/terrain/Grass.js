@@ -7,9 +7,9 @@ export default class Grass{
         objMaterial.transparent = true;
         objMaterial.depthTest = true;
         objMaterial.fog =true;
-        const object2 = new Sprite(objMaterial);
-        object2.name = "Billboard";
+        const sprite = new Sprite(objMaterial);
+        sprite.name = "Billboard";
 
-        return(object2);
+        return(sprite);
     }
 }

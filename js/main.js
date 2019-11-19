@@ -3,27 +3,18 @@ import {
     WebGLRenderer,
     PCFSoftShadowMap,
     Scene,
-    BoxBufferGeometry,
+    PlaneBufferGeometry,
     Mesh,
     TextureLoader,
     RepeatWrapping,
     DirectionalLight,
-    MeshPhongMaterial,
+    MeshLambertMaterial,
     Vector3,
     Vector2,
-    Geometry,
-    Face3,
-    BoxGeometry,
-    Light,
     Object3D,
-    CameraHelper,
-    MeshBasicMaterial,
-    PlaneGeometry,
     Fog,
     Raycaster,
-    ShaderMaterial,
     UniformsUtils,
-    UniformsLib,
     MirroredRepeatWrapping,
 } from './lib/three.module.js';
 import Utilities from './lib/Utilities.js';
@@ -470,7 +461,13 @@ function loop(now) {
         rgb = "0xff" + g + b;
         sunLight.color.setHex(rgb);
     } else {
-        sunLight.intensity = (moonPos.y / 2100) + 0.2;
+        //Darkens skybox nighttime for smoother transition.
+        rs = gs = bs = Math.floor(((255 * ((moonPos.y) / 420)))).toString(16);
+        if(rs.length < 2){
+            rs = gs = bs = "0"+rs;
+        }
+        rgbs = "0x"+rs+gs+bs;
+        nightbox.material.color.setHex(rgbs);
     }
 
     //Animating water
