@@ -221,6 +221,9 @@ uniforms = UniformsUtils.merge([
         speed: {value: [1.2, 2.0, 2.8, 3.6, 4.4, 5.2, 6.0, 6.8]},
         direction: {value: angle},
         numWaves: {value: 100},
+        fogColor: dayColor,
+        fogNear: fognear,
+        fogFar: fogfar,
     }
 ]);
 uniforms.texture2.value = waterTexture;
@@ -410,6 +413,7 @@ function loop(now) {
         scene.remove(nightbox);
 
         scene.fog = new Fog(dayColor, fognear, fogfar);
+        ocean.material.uniforms.fogColor.value = dayColor;
     }
     if ((moonPos.y >= 0) && (moonBool === true)) {
         sun.remove(sunLight);
@@ -422,6 +426,7 @@ function loop(now) {
         scene.add(nightbox);
 
         scene.fog = new Fog(nightColor, fognear, fogfar);
+        ocean.material.uniforms.fogColor.value = nightColor;
     }
 
     //Regulating the intensity of the light to simulate more realistic day/night cycle

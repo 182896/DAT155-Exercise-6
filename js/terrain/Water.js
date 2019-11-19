@@ -13,6 +13,7 @@ export default class water{
             fragmentShader: document.getElementById("fragmentShader").textContent,
         });
 
+        material.fog = true;
         let geometry = new PlaneBufferGeometry(maxRow, maxCol, segmentRow, segmentCol);
         let mesh = new Mesh(geometry, material);
         mesh.doublesided = true;

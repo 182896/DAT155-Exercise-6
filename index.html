@@ -91,6 +91,9 @@
         varying vec2 vUv;
         uniform sampler2D texture2;
         uniform float time2;
+        uniform vec3 fogColor;
+        uniform float fogNear;
+        uniform float fogFar;
 
         void main() {
         vec2 position = -1.0 + 2.0 * vUv;
@@ -100,6 +103,15 @@
         T.y += noise.z*0.2;
         vec4 color = texture2D(texture2, T*1.5);
         gl_FragColor = color;
+        #ifdef USE_FOG
+            #ifdef USE_LOGDEPTHBUF_EXT
+                float depth = gl_FragDepthEXT / gl_FragCoord.w;
+            #else
+                float depth = gl_FragCoord.z / gl_FragCoord.w;
+            #endif
+            float fogFactor = smoothstep( fogNear, fogFar, depth );
+            gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+        #endif
         }
     </script>
 </body>
