@@ -23,7 +23,8 @@ import {
     Raycaster,
     ShaderMaterial,
     UniformsUtils,
-    UniformsLib
+    UniformsLib,
+    MirroredRepeatWrapping,
 } from './lib/three.module.js';
 import Utilities from './lib/Utilities.js';
 import MouseLookController from './controls/MouseLookController.js';
@@ -205,8 +206,8 @@ loader.setCrossOrigin("");
 let uniforms;
 let waterTexture;
 waterTexture = loader.load("resources/textures/water.jpg");
-waterTexture.wrapS = RepeatWrapping;
-waterTexture.wrapT = RepeatWrapping;
+waterTexture.wrapS = MirroredRepeatWrapping;
+waterTexture.wrapT = MirroredRepeatWrapping;
 waterTexture.repeat.set(25, 25);
 
 uniforms = UniformsUtils.merge([
