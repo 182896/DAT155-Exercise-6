@@ -207,7 +207,7 @@ let uniforms;
 let waterTexture;
 waterTexture = loader.load("resources/textures/water.jpg");
 waterTexture.wrapS = MirroredRepeatWrapping;
-waterTexture.wrapT = MirroredRepeatWrapping;
+waterTexture.wrapT = RepeatWrapping;
 waterTexture.repeat.set(25, 25);
 
 uniforms = UniformsUtils.merge([
