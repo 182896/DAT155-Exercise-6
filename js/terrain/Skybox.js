@@ -5,7 +5,7 @@ export default class Skybox extends Mesh {
     constructor ({textureMap, radius, widthSegments, heightSegments}){
 
         let geometry = new SphereGeometry(radius, widthSegments, heightSegments);
-        let material = new MeshBasicMaterial({map: textureMap, side: BackSide, lightMapIntensity: 0.2});
+        let material = new MeshBasicMaterial({map: textureMap, side: BackSide});
         super(geometry, material);
     }
 }

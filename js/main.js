@@ -103,6 +103,7 @@ let dayColor = 0xdddddd;
 let nightColor = 0x000000;
 let fognear = 0.1;
 let fogfar = 500;
+scene.fog = new Fog(dayColor, fognear, fogfar);
 
 //------------------SKYBOX----------------------------
 const skyTexture = new TextureLoader().load('resources/textures/skybox.jpg');
@@ -346,10 +347,15 @@ let then = performance.now();
 let moonBool = false;
 let moonPos = new Vector3();
 let sunPos = new Vector3();
-//Color variables
+//Color variables for sunlight
 let g = "ff";
 let b = "ff";
 let rgb;
+//Color variables for skybox
+let rs = "ff";
+let bs = "ff";
+let gs = "ff";
+let rgbs;
 function loop(now) {
 
     const delta = now - then;
@@ -412,7 +418,7 @@ function loop(now) {
         scene.add(skybox);
         scene.remove(nightbox);
 
-        scene.fog = new Fog(dayColor, fognear, fogfar);
+        scene.fog.color.setHex(dayColor);
         ocean.material.uniforms.fogColor.value = dayColor;
     }
     if ((moonPos.y >= 0) && (moonBool === true)) {
@@ -425,13 +431,23 @@ function loop(now) {
         scene.remove(skybox);
         scene.add(nightbox);
 
-        scene.fog = new Fog(nightColor, fognear, fogfar);
+        scene.fog.color.setHex(nightColor);
         ocean.material.uniforms.fogColor.value = nightColor;
     }
 
     //Regulating the intensity of the light to simulate more realistic day/night cycle
     if (moonBool === true) {
         sunLight.intensity = (sunPos.y / 2100) + 0.2;
+
+        //Changing color of skybox and fog with day/night cycle
+        rs = gs = bs = Math.floor(((255 * ((sunPos.y) / 420)))).toString(16);
+        if(rs.length < 2){
+            rs = gs = bs = "0"+rs;
+        }
+        rgbs = "0x"+rs+gs+bs;
+        skybox.material.color.setHex(rgbs);
+        scene.fog.color.setHex(rgbs);
+
         //Creating a sunset and sunrise color.
         b = Math.floor((128 + (255 * (sunPos.y / 840)))).toString(16);
         g = Math.floor((170 + (255 * (sunPos.y / 1260)))).toString(16);
