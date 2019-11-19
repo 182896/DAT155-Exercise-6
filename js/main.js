@@ -115,13 +115,9 @@ const origin = new Vector3(0.0, 50.0, 0.0);
 const current = new Vector3(0.0, -1.0, 0.0);
 const raycaster = new Raycaster(origin, current);
 
-//---------------CUBE OBJECT--------------------------------------
+//---------------LOD OBJECT--------------------------------------
 const LODbox = new LODobject(0xffdd11);
-
-LODbox.castShadow = true;
-
 sunLight.target = LODbox;
-
 scene.add(LODbox);
 
 /**
@@ -227,7 +223,8 @@ uniforms = UniformsUtils.merge([
     }
 ]);
 uniforms.texture2.value = waterTexture;
-let ocean = new Water(maxRow, maxCol, segmentRow, segmentCol, uniforms, new Vector3(0, -5, 0));
+let oceanPosition = new Vector3(0, -5, 0);
+let ocean = new Water(maxRow, maxCol, segmentRow, segmentCol, uniforms, oceanPosition);
 scene.add(ocean);
 
 /**

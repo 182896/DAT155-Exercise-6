@@ -23,6 +23,8 @@ let i, mesh, lod;
 
         mesh = new Mesh(geometry[i][0], material);
         mesh.scale.set(1.5, 1.5, 1.5);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
         mesh.updateMatrix();
         mesh.matrixAutoUpdate = false;
         lod.addLevel(mesh, geometry[i][1]);
