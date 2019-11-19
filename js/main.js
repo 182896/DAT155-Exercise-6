@@ -36,6 +36,7 @@ import Grass from "./terrain/Grass.js";
 import Sun from "./terrain/Sun.js";
 import Moon from "./terrain/Moon.js";
 import Water from "./terrain/Water.js";
+import LODobject from "./terrain/LODobject.js";
 
 const scene = new Scene();
 //-------------------------------------SUN------------------------------------------------------------------
@@ -81,6 +82,9 @@ window.addEventListener('resize', () => {
  */
 document.body.appendChild(renderer.domElement);
 
+camera.position.z = 10;
+camera.position.y = 25;
+
 //-------------------SUNLIGHT--------------------------
 let sunLight = new DirectionalLight(0xffffff, 1);
 
@@ -106,62 +110,19 @@ const skybox = new Skybox({textureMap: skyTexture, radius: 500, widthSegments: 6
 const nightTexture = new TextureLoader().load("resources/textures/skyboxNight.jpg");
 const nightbox = new Skybox({textureMap: nightTexture, radius: 500, widthSegments: 60, heightSegments: 40});
 
-//---------------CUBE OBJECT--------------------------------------
-const geometry = new BoxBufferGeometry(0, 0, 0);
-const material = new MeshPhongMaterial({ color: 0xffdd11, reflectivity: 0.8 });
-const triforce = new Mesh(geometry, material);
-
-triforce.castShadow = true;
-triforce.position.set(0, 25, 0);
-
-sunLight.target = triforce;
-
-camera.position.z = 10;
-camera.position.y = 25;
-//------------------GODRAYS---------------------------
-
-
 //--------------RAYCASTING----------------------------------
 const origin = new Vector3(0.0, 50.0, 0.0);
 const current = new Vector3(0.0, -1.0, 0.0);
 const raycaster = new Raycaster(origin, current);
 
-//---------------------TRIFORCE----------------------------
-/*
-const createTriangle = ({x=0, y=0} = {})=>{
-    const geo = new Geometry();
-    geo.vertices.push(new Vector3(-1, 1.5, 0));
-    geo.vertices.push(new Vector3(-0.5, 0.5, 0));
-    geo.vertices.push(new Vector3(-1.5, 0.5, 0));
-    geo.vertices.push(new Vector3(-1, 1.5, 0.2));
-    geo.vertices.push(new Vector3(-0.5, 0.5, 0.2));
-    geo.vertices.push(new Vector3(-1.5, 0.5, 0.2));
-    geo.faces.push(new Face3(0,1,2));
-    geo.faces.push(new Face3(3,4,5));
+//---------------CUBE OBJECT--------------------------------------
+const LODbox = new LODobject(0xffdd11);
 
-    geo.faces.push(new Face3(0,1,4));
-    geo.faces.push(new Face3(0,3,4));
+LODbox.castShadow = true;
 
-    geo.faces.push(new Face3(0,2,3));
-    geo.faces.push(new Face3(2,3,5));
+sunLight.target = LODbox;
 
-    geo.faces.push(new Face3(1,2,4));
-    geo.faces.push(new Face3(2,4,5));
-
-    geo.computeFaceNormals();
-    const triangle = new Mesh(geo, material);
-
-    triforce.add(triangle);
-    triangle.position.x = x;
-    triangle.position.y = y;
-};
-
-createTriangle({x:1, y:0});
-createTriangle({x:0.5, y:-1});
-createTriangle({x:1.5, y:-1});
-*/
-
-scene.add(triforce);
+scene.add(LODbox);
 
 /**
  * Add terrain:
@@ -230,10 +191,10 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
 
 
 //Size variables of water
-    let maxRow = 10;
-    let maxCol = 10;
-    let segmentRow = 10;
-    let segmentCol = 10;
+let maxRow = 1000;
+let maxCol = 1000;
+let segmentRow = 10;
+let segmentCol = 10;
 
 //Uniforms declaration
     let angle = [];
@@ -262,11 +223,11 @@ uniforms = UniformsUtils.merge([
         wavelength: {value: [25.133, 12.566, 8.378, 6.283, 5.027, 4.189, 3.590, 3.142]},
         speed: {value: [1.2, 2.0, 2.8, 3.6, 4.4, 5.2, 6.0, 6.8]},
         direction: {value: angle},
-        numWaves: {value: 100}
+        numWaves: {value: 100},
     }
 ]);
 uniforms.texture2.value = waterTexture;
-let ocean = new Water(1000, 1000, 10, 10, uniforms, new Vector3(0, 0, 0));
+let ocean = new Water(maxRow, maxCol, segmentRow, segmentCol, uniforms, new Vector3(0, -5, 0));
 scene.add(ocean);
 
 /**
@@ -425,8 +386,9 @@ function loop(now) {
 
 
     // animate cube rotation:
-    triforce.rotation.x += 0.01;
-    triforce.rotation.y += 0.01;
+    LODbox.rotation.x += 0.01;
+    LODbox.rotation.y += 0.01;
+    LODbox.update(camera);
 
     if (pause === false) {
         //orbital speed for sun and moon

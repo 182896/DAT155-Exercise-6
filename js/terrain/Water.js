@@ -17,9 +17,6 @@ export default class water{
         let mesh = new Mesh(geometry, material);
         mesh.doublesided = true;
         mesh.rotation.x = -1.570796;
-        mesh.receiveShadow = true;
-        mesh.castShadow = true;
-        mesh.fog = true;
         mesh.position.set(position.x, position.y, position.z);
         return mesh;
     }
