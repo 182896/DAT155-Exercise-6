@@ -3,12 +3,10 @@ import {
     WebGLRenderer,
     PCFSoftShadowMap,
     Scene,
-    PlaneBufferGeometry,
     Mesh,
     TextureLoader,
     RepeatWrapping,
     DirectionalLight,
-    MeshLambertMaterial,
     Vector3,
     Vector2,
     Object3D,
@@ -128,12 +126,6 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
         height: 40
     });
 
-    // const terrainMaterial = new MeshPhongMaterial({
-    //     color: 0x777777
-    // });
-
-
-
     const grassTexture = new TextureLoader().load('resources/textures/grass_01.jpg');
     grassTexture.wrapS = RepeatWrapping;
     grassTexture.wrapT = RepeatWrapping;
@@ -165,9 +157,9 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
 
     function makeGrass(grass){
         x = Math.floor(Math.random()*49) + 1;
-        x *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+        x *= Math.floor(Math.random()*2) === 1 ? 1 : -1;
         z = Math.floor(Math.random()*49) + 1;
-        z *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+        z *= Math.floor(Math.random()*2) === 1 ? 1 : -1;
         const raycaster = new Raycaster();
         const direction = new Vector3(0.0, -1.0, 0.0);
         //const move = new Vector3();
@@ -279,6 +271,7 @@ let move = {
 
 let pause = false;
 let renderPause = false;
+let cameraArc = false;
 window.addEventListener('keydown', (e) => {
     if (e.code === 'KeyW') {
         move.forward = true;
@@ -301,6 +294,10 @@ window.addEventListener('keydown', (e) => {
     }else if ((e.code === "KeyZ") && (renderPause === true)){
         renderPause = false;
         loop(performance.now());
+    }else if ((e.code === "KeyM") && (cameraArc === false)){
+        cameraArc = true;
+    }else if ((e.code === "KeyM") && (cameraArc === true)){
+        cameraArc = false;
 }
 });
 
@@ -350,7 +347,8 @@ window.addEventListener('keyup', (e) => {
 const velocity = new Vector3(0.0, 0.0, 0.0);
 
 let then = performance.now();
-//Position variables
+let time = 0;
+//Position variables for moon and sun
 let moonBool = false;
 let moonPos = new Vector3();
 let sunPos = new Vector3();
@@ -387,16 +385,6 @@ function loop(now) {
     if (move.backward) {
         velocity.z += moveSpeed;
     }
-
-    // update controller rotation.
-    mouseLookController.update(pitch, yaw);
-    yaw = 0;
-    pitch = 0;
-
-    // apply rotation to velocity vector, and translate moveNode with it.
-
-    velocity.applyQuaternion(camera.quaternion);
-    camera.position.add(velocity);
 
 
     // animate cube rotation:
@@ -473,6 +461,22 @@ function loop(now) {
     //Animating water
     ocean.material.uniforms.time.value += 0.001;
     ocean.material.uniforms.time2.value += 0.004;
+
+    // apply rotation to velocity vector, and translate moveNode with it.
+    time += 0.001;
+    if(cameraArc === false) {
+        // update controller rotation.
+        mouseLookController.update(pitch, yaw);
+        yaw = 0;
+        pitch = 0;
+        velocity.applyQuaternion(camera.quaternion);
+        camera.position.add(velocity);
+    }else if(cameraArc === true){
+        camera.position.x = LODbox.position.x + 200 * Math.cos( 3.14159 * time );
+        camera.position.z = LODbox.position.z + 200 * Math.sin( 3.14159 * time );
+        camera.lookAt(LODbox.position);
+    }
+
 
     // render scene:
     renderer.render(scene, camera);
