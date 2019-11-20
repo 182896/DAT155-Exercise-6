@@ -14,6 +14,7 @@ import {
     Raycaster,
     UniformsUtils,
     MirroredRepeatWrapping,
+    LoadingManager,
 } from './lib/three.module.js';
 import Utilities from './lib/Utilities.js';
 import MouseLookController from './controls/MouseLookController.js';
@@ -27,7 +28,50 @@ import Sun from "./terrain/Sun.js";
 import Moon from "./terrain/Moon.js";
 import Water from "./terrain/Water.js";
 import LODobject from "./terrain/LODobject.js";
+import OBJLoader from "./loaders/OBJLoader.js";
+import MTLLoader from "./loaders/MTLLoader.js";
 
+let loadingManager = new LoadingManager();
+
+// Models index
+let models = {
+    tree: {
+        obj:"resources/models/lowpolytree.obj",
+        mtl:"resources/models/lowpolytree.mtl",
+        mesh: null
+    },
+};
+
+// function modelLoad(){
+//     console.log("in modelLoad")
+for( let _key in models ){
+    (function(key){
+
+        let mtlLoader = new MTLLoader(loadingManager);
+        mtlLoader.load(models[key].mtl, function(materials){
+            materials.preload();
+
+            let objLoader = new OBJLoader(loadingManager);
+
+            objLoader.setMaterials(materials);
+            objLoader.load(models[key].obj, function(mesh){
+
+                mesh.traverse(function(node){
+                    if( node instanceof Mesh ){
+                        node.castShadow = true;
+                        node.receiveShadow = true;
+                    }
+                });
+                models[key].mesh = mesh;
+
+            });
+        });
+
+    })(_key);
+}
+// }
+
+let RESOURCES_LOADED = false;
 const scene = new Scene();
 //-------------------------------------SUN------------------------------------------------------------------
 
@@ -66,6 +110,14 @@ window.addEventListener('resize', () => {
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 }, false);
+
+
+loadingManager.onLoad = function(){
+    console.log("loaded all resources");
+    RESOURCES_LOADED = true;
+    onResourcesLoaded();
+    //modelLoad();
+}
 
 /**
  * Add canvas element to DOM.
@@ -174,6 +226,32 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
     for(let i =0; i<200; i++){
         const grass = new Grass({texture:GrassTexture});
         makeGrass(grass);
+    }
+
+
+    //--------------TREES----------------------------------
+    // Mesh index
+    let meshes = {};
+
+    function makeTrees(){
+        let x, z;
+        meshes["tree1"] = models.tree.mesh.clone();
+        x = Math.floor(Math.random()*49) + 1;
+        x *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+        z = Math.floor(Math.random()*49) + 1;
+        z *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+        const raycaster = new Raycaster();
+        const direction = new Vector3(0.0, -1.0, 0.0);
+        raycaster.set(new Vector3(x, 150, z), direction);
+        let array = raycaster.intersectObject(terrain);
+        if(array[0].point.y<25 || array[0].point.y>5) {
+            meshes["tree1"].position.set(array[0].point.x, array[0].point.y+0.3, array[0].point.z);
+            scene.add(meshes["tree1"]);
+        }
+    }
+
+    for(let i =0; i<10; i++){
+        makeTrees();
     }
 
 
@@ -319,28 +397,36 @@ window.addEventListener('keyup', (e) => {
 
 
 
-// // instantiate a loader
-// const loader = new OBJLoader();
 
+
+
+
+// // instantiate a loader
+// const modelLoader = new OBJLoader();
+//
 // // load a resource
-// loader.load(
+// modelLoader.load(
 //     // resource URL
 //     'resources/models/sofa.obj',
 //     // called when resource is loaded
 //     function (object) {
-//         scene.add(object);
+//         let material, mesh;
+//         material = new MeshBasicMaterial(object)
+//         mesh = new Mesh(object, material)
+//
+//         scene.add(mesh);
 //     },
 //     // called when loading is in progresses
 //     function (xhr) {
-
+//
 //         console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-
+//
 //     },
 //     // called when loading has errors
 //     function (error) {
-
+//
 //         console.log('An error happened');
-
+//
 //     }
 // );
 
