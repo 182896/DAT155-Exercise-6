@@ -115,7 +115,7 @@ window.addEventListener('resize', () => {
 loadingManager.onLoad = function(){
     console.log("loaded all resources");
     RESOURCES_LOADED = true;
-    onResourcesLoaded();
+    //onResourcesLoaded();
     //modelLoad();
 }
 
@@ -175,7 +175,7 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
         width,
         heightmapImage,
         numberOfSubdivisions: 128,
-        height: 40
+        height: 20
     });
 
     const grassTexture = new TextureLoader().load('resources/textures/grass_01.jpg');
@@ -246,6 +246,7 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
         let array = raycaster.intersectObject(terrain);
         if(array[0].point.y<25 || array[0].point.y>5) {
             meshes["tree1"].position.set(array[0].point.x, array[0].point.y+0.3, array[0].point.z);
+            meshes["tree1"].scale.set(2,2,2);
             scene.add(meshes["tree1"]);
         }
     }
