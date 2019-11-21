@@ -31,11 +31,6 @@
       </map>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="1273" />
-    <option name="width" value="1294" />
-    <option name="height" value="1407" />
-  </component>
   <component name="ProjectId" id="1SeEoraV1q5mU0zKcCH1l0YZ4mP" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -103,7 +98,7 @@
       <workItem from="1574287576649" duration="4730000" />
       <workItem from="1574335875979" duration="2263000" />
       <workItem from="1574339926670" duration="74000" />
-      <workItem from="1574340020954" duration="593000" />
+      <workItem from="1574340020954" duration="1183000" />
     </task>
     <task id="LOCAL-00001" summary="trees">
       <created>1574250949520</created>

@@ -217,9 +217,11 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
         //const move = new Vector3();
         raycaster.set(new Vector3(x, 150, z), direction);
         let array = raycaster.intersectObject(terrain);
-        if(array[0].point.y<25 || array[0].point.y>5) {
+        if(array[0].point.y<25 && array[0].point.y>10) {
             grass.position.set(array[0].point.x, array[0].point.y+0.3, array[0].point.z);
             scene.add(grass);
+        }else{
+            makeGrass(grass);
         }
     }
 
@@ -244,10 +246,12 @@ Utilities.loadImage('resources/images/heightmap.png').then((heightmapImage) => {
         const direction = new Vector3(0.0, -1.0, 0.0);
         raycaster.set(new Vector3(x, 150, z), direction);
         let array = raycaster.intersectObject(terrain);
-        if(array[0].point.y<25 || array[0].point.y>5) {
+        if(array[0].point.y<25 && array[0].point.y>10) {
             meshes["tree1"].position.set(array[0].point.x, array[0].point.y+0.3, array[0].point.z);
             meshes["tree1"].scale.set(2,2,2);
             scene.add(meshes["tree1"]);
+        }else{
+            makeTrees();
         }
     }
 
