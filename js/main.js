@@ -550,7 +550,7 @@ function loop(now) {
     ocean.material.uniforms.time2.value += 0.004;
 
     // apply rotation to velocity vector, and translate moveNode with it.
-    time += 0.001;
+    time += 0.0005;
     if(cameraArc === false) {
         // update controller rotation.
         mouseLookController.update(pitch, yaw);
